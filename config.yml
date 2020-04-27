@@ -1,0 +1,9 @@
+---
+core:
+  num_workers: 100
+inventory:
+  plugin: nornir.plugins.inventory.simple.SimpleInventory
+  options:
+    host_file: "~/nornir_framework/ddos_mitigation/inventory/hosts.yml"
+    group_file: "~/nornir_framework/ddos_mitigation/inventory/groups.yml"
+    defaults_file: "~/nornir_framework/ddos_mitigation/inventory/defaults.yml"
