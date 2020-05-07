@@ -1,0 +1,6 @@
+{
+    "material-icon-theme.files.associations": {
+    
+        "python.pythonPath":" ${workspaceFolder}/env/bin/python3"
+    }
+}
