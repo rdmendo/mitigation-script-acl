@@ -1,7 +1,6 @@
 from nornir import InitNornir
 from nornir.plugins.tasks import networking, text
-from nornir.plugins.functions.text import print_title, print_result
-from prettytable import PrettyTable
+from nornir.plugins.functions.text import print_title
 from netaddr import IPNetwork, AddrFormatError
 from colorama import Fore
 from tabulate import tabulate
@@ -16,7 +15,7 @@ headers = ["HOSTNAME", "NETWORK ADDRESS", "ACTIVITY", "STATUS"]
 while True:
     try:
         print("*" * 80)
-        print("Supported Task: [DIVERT , NO_DIVERT, DIVERT_ALL, NO_DIVERT_ALL] ")
+        print("Supported Task: [DIVERT, NO_DIVERT, DIVERT_ALL, NO_DIVERT_ALL]")
         print("*" * 80)
         mitigations = input("DDOS MITIGATION TASK\t\t:\t")
         tasks = mitigations.lower()
@@ -28,7 +27,7 @@ while True:
         elif tasks == "no_divert_all":
             break
 
-    except:
+    except Exception:
         print(Fore.RED + ("NOT A VALID TASK") + Fore.RESET)
         continue
 
@@ -37,11 +36,10 @@ while True:
         net = IPNetwork(net_ip)
         print("*" * 80)
 
-        # will loop the ip_list and verify if the ip is existing or allowed for divert
+        # will loop the ip_list and verify
+        # if the ip is existing or allowed divert
 
-        with open(
-            "inventory/network_addr.cfg", "r"
-        ) as listed_ip:
+        with open("inventory/network_addr.cfg", "r") as listed_ip:
             for allowed_ip in listed_ip:
                 ip_list.append(allowed_ip.strip())
 
@@ -58,7 +56,7 @@ while True:
         )
         continue
 
-    except Exception as err:
+    except Exception:
         print(Fore.RED + (f"INVALID! {net_ip} IS NOT ALLOWED FOR DIVERT!") + Fore.RESET)
         continue
 
@@ -92,8 +90,6 @@ def main() -> None:
     result = nr.run(task=mitigation)
     failed_host = result.failed_hosts.keys()
     hosts = nr.inventory.hosts
-    failure = result.failed
-    hostx = ""
 
     if tasks == "divert":
         activity = tasks.upper()
@@ -163,5 +159,5 @@ def main() -> None:
 if __name__ == "__main__":
     main()
     print("")
-    print("\t" + tabulate(table, headers, tablefmt="rst", colalign="left"))
+    print(tabulate(table, headers, tablefmt="rst", colalign="left"))
     print("")

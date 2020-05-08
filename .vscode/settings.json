@@ -2,5 +2,7 @@
     "material-icon-theme.files.associations": {
     
         "python.pythonPath":" ${workspaceFolder}/env/bin/python3"
-    }
+    },
+    "python.linting.enabled": false,
+    "python.linting.flake8Enabled": true
 }
