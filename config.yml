@@ -4,6 +4,6 @@ core:
 inventory:
   plugin: nornir.plugins.inventory.simple.SimpleInventory
   options:
-    host_file: "~/nornir_framework/ddos_mitigation/inventory/hosts.yml"
-    group_file: "~/nornir_framework/ddos_mitigation/inventory/groups.yml"
-    defaults_file: "~/nornir_framework/ddos_mitigation/inventory/defaults.yml"
+    host_file: "inventory/hosts.yml"
+    group_file: "inventory/groups.yml"
+    defaults_file: "inventory/defaults.yml"
