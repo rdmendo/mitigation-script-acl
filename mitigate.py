@@ -1,10 +1,13 @@
+from datetime import datetime
 from nornir import InitNornir
 from nornir.plugins.tasks import networking, text
-from nornir.plugins.functions.text import print_title
+from nornir.plugins.functions.text import print_title, print_result
+from nornir.plugins.tasks.networking import netmiko_send_command
 from netaddr import IPNetwork, AddrFormatError
 from colorama import Fore
 from tabulate import tabulate
 
+start_time = datetime.now()
 nr = InitNornir(config_file="config.yml", dry_run=True)
 ip_list = []
 result = ""
@@ -83,11 +86,33 @@ def mitigation(task):
         configuration=task.host["config"],
     )
 
+show_adv_headers = ["ADVERTISED PREFIXES IN INCAPSULA NETWORK via eBGP"]
+# show_adv_headers = ["Network", "Nexthop", "Weight"]
+table_adv = []
+
+def show_adv_routes(task):
+        hostname = task.host.hostname
+        tunnel_ip_r1 = ["172.17.32.161", "172.17.160.9"]
+        tunnel_ip_r2 = ["172.17.32.165", "172.17.160.13"]
+        
+        if hostname == "192.168.1.1":
+            for tunnel in tunnel_ip_r1:
+                adv_routes = task.run(netmiko_send_command, command_string=f"show ip bgp neighbors {tunnel} advertised-routes",use_textfsm=True)
+                task.host['adv_routes'] = adv_routes.result
+                net_adv_routes = task.host['adv_routes']
+            
+            for prefix in net_adv_routes:
+                bgp_prefix = prefix['network']
+                # bgp_hop = prefix['next_hop']
+                # bgp_weight = prefix['weight']
+                table_adv.append([bgp_prefix])
 
 def main() -> None:
     nr.data.dry_run = False
     print_title("DDOS MITIGATION IS CURRENTLY RUNNING! PLEASE WAIT!")
     result = nr.run(task=mitigation)
+    adv_routes = nr.run(task=show_adv_routes)
+    # print_result(adv_routes)
     failed_host = result.failed_hosts.keys()
     hosts = nr.inventory.hosts
 
@@ -154,10 +179,15 @@ def main() -> None:
                         Fore.GREEN + ("SUCCESS") + Fore.RESET,
                     ]
                 )
-
-
+                
+            
 if __name__ == "__main__":
     main()
+    date_time = datetime.now() - start_time
     print("")
-    print(tabulate(table, headers, tablefmt="rst", colalign="left"))
-    print("")
+    print(tabulate(table, headers, tablefmt="rst"))
+    print(tabulate(table_adv, show_adv_headers,tablefmt="rst"))
+    print(Fore.GREEN + "mitigation time: " + Fore.RESET + str(date_time))
+
+
+
